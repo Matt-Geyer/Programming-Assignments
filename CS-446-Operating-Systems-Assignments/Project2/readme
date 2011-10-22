@@ -1,0 +1,18 @@
+Performs multi-threaded matrix multiplication
+
+Accepts text files that represent a matrix in the following format
+
+<#rows>
+<#cols>
+<a00> ...... <a0j>
+<ai0> ...... <aij>
+
+e.g.
+
+3
+4
+1 2 3 9
+2 3 4 8
+2 4 6 1
+
+Pass arguments to the program with ./multiplier <a.txt> <b.txt> (order matters) 

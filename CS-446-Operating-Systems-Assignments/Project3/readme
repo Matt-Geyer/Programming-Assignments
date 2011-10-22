@@ -1,0 +1,8 @@
+Simulates the producer / consumer problem on a buffer implemented as a circular queue
+
+Run with ./prodcon <# producers> <# consumers> <time to run>
+
+Producers should only produce when there is empty space in the buffer.
+Similarly, consumers only consume when there is something in the buffer to consume.
+
+

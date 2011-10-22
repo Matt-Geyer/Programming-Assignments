@@ -1,0 +1,24 @@
+Takes a text file that has a family tree in the format
+
+<parent1> <parent2> <# children> <child 1> <child 2> ... <child n>
+
+e.g.
+
+A B 3 C D X
+D Y 2 M E
+M F 0
+C P 1 K
+
+The program then begins a process ( fork() ) for every child and prints the letter
+with the appropriate number of tabs for each generation.
+
+e.g.
+
+A-B
+	C-P
+		K
+	D-Y
+		M-F
+		E
+	X
+

@@ -1,0 +1,9 @@
+I will have to see if I can track down the write-up for this assignment
+
+Basically it is a simulated CPU dispatcher. Active processes with the highest priority are given
+ticks to simulate CPU time. At the end stats are printed based on what the dispatcher did.
+
+The program accepts a file that has a processes arrival time, priorty, and number of ticks
+required to run to completion. 
+
+Once all processes have been run to completeion the program will output some statistics.
