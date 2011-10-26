@@ -22,6 +22,7 @@ point::point( float cx , float cy ){
 }
 
 void bestFit( vector<point*> , float& , float& );
+float error( vector<point*> , float , float );
 
 int main( int argc , char** argv ){
 
@@ -43,13 +44,28 @@ int main( int argc , char** argv ){
         tp = new point( x , y );
         points.push_back( tp );
     }
+    points.pop_back();
     fin.close();
     
-    float aa = 0, bb = 0;           
-    bestFit( points , aa , bb );
-    cout << aa << " " << bb << endl;
+    float a = 0,
+          b = 0,
+          err = 0;    
+    bestFit( points , a , b );
+    err = error( points , a , b );
+    cout << a << " " << b << " error: " << err << endl;
 
     return 0;
+}
+
+float error( vector<point*> pairs , float a , float b ){
+    // Find the error of a line L on a set of pairs P
+ 
+    float err = 0, term = 0;
+    for( int i = 0; i < pairs.size(); i++ ){
+        term = pairs[i]->y  - ( a * pairs[i]->x + b );
+        err += term * term;
+    }
+    return err;
 }
 
 void bestFit( vector<point*> pairs , float& a , float& b ){
