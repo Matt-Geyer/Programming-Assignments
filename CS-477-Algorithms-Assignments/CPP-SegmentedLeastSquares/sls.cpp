@@ -21,8 +21,9 @@ point::point( float cx , float cy ){
     y = cy;
 }
 
-void bestFit( vector<point*> , float& , float& );
-float error( vector<point*> , float , float );
+void bestFit( vector<point*>& , float& , float& );
+float error( vector<point*>& , float , float );
+void subVec( vector<point*>& , vector<point*>& , int , int );
 
 int main( int argc , char** argv ){
 
@@ -51,13 +52,39 @@ int main( int argc , char** argv ){
           b = 0,
           err = 0;    
     bestFit( points , a , b );
+
+    vector<point*> sub;
+    float eij[points.size()][points.size()];
+    for( int i = 0; i < points.size(); i++ ){
+        for( int j = 0; j < points.size(); j++ ){
+            eij[i][j] = 0;
+        }
+    }
+    // compute eij for all pairs i < j
+    for( int j = 1; j < points.size(); j++ ){
+        for( int i = 0; i < j; i++ ){
+            sub.clear();
+            subVec( points , sub , i , j );
+            eij[i][j] = error( sub , a , b );
+        }
+    }
+
     err = error( points , a , b );
     cout << a << " " << b << " error: " << err << endl;
 
     return 0;
 }
 
-float error( vector<point*> pairs , float a , float b ){
+void subVec( vector<point*>& vec, vector<point*>& subVec, int i , int j ){
+    // quick google didn't turn up a quick way to do this.
+    
+    for( int s = i; s <= j; s++ ){
+        subVec.push_back( vec[s] );
+    }
+    return;
+}
+
+float error( vector<point*>& pairs , float a , float b ){
     // Find the error of a line L on a set of pairs P
  
     float err = 0, term = 0;
@@ -68,7 +95,7 @@ float error( vector<point*> pairs , float a , float b ){
     return err;
 }
 
-void bestFit( vector<point*> pairs , float& a , float& b ){
+void bestFit( vector<point*>& pairs , float& a , float& b ){
    // Find the line of best fit on a set of points P
 
    int n = pairs.size();
