@@ -14,16 +14,27 @@ class point{
   public:
     float x,y;
     point( float , float );
+    void print();
 };
 
 point::point( float cx , float cy ){ 
     x = cx;
     y = cy;
 }
+void point::print(){ 
+    cout << "( " << x << " , " << y << " )" << endl; 
+    return;
+}
 
 void bestFit( vector<point*>& , float& , float& );
 float error( vector<point*>& , float , float );
 void subVec( vector<point*>& , vector<point*>& , int , int );
+float segSquares( vector<point*>& , int );
+void findSegs( int );
+
+float* M;
+float** eij;
+vector<point*> points;
 
 int main( int argc , char** argv ){
 
@@ -31,10 +42,6 @@ int main( int argc , char** argv ){
     if( argc > 1 ){
         fileName = argv[1];
     }
-  
-    // Went with pointer to prevent destructor
-    // being called on my points if incase I need to remove them!
-    vector<point*> points;  
   
     // Read in the initial points
     ifstream fin(fileName.c_str());
@@ -47,32 +54,87 @@ int main( int argc , char** argv ){
     }
     points.pop_back();
     fin.close();
-    
+    cout << points.size() << endl;
+    segSquares( points , points.size() );
+    findSegs( points.size() );
+
+    for( int i = 0; i < points.size(); i++ ){
+        //cout << M[i] << endl;
+    }
+    return 0;
+}
+
+void findSegs( int j ){
+    float C = 1.0, sum = 0.0, min = 100000.0, min_i = 0.0;
+    if( j == 0 ) return;
+  
+    else{
+        for( int i = 1; i < j; i++ ){
+            sum = eij[i][j] + C + M[i-1];
+            //cout << sum << " " << min << endl;
+            if( sum < min ){
+                min = sum;
+                min_i = i;
+            }
+        }
+        cout << "Calling findSegs with " << min_i << endl;
+        findSegs( min_i - 1 );
+        for( int i = min_i; i < j; i++ ){
+            points[i]->print();
+        }
+    }
+}
+            
+        
+
+float segSquares( vector<point*>& points , int n ){
+    // do segmented least squares
+    M = new float[n];
+    M[0] = 0;
+
     float a = 0,
           b = 0,
           err = 0;    
-    bestFit( points , a , b );
 
     vector<point*> sub;
-    float eij[points.size()][points.size()];
+
+    // Allocate memory for the eij array and initlaize values to 0
+    eij = new float*[points.size()];
+    for( int i = 0; i < points.size(); i++ ){
+        eij[i] = new float[points.size()];
+    }
     for( int i = 0; i < points.size(); i++ ){
         for( int j = 0; j < points.size(); j++ ){
             eij[i][j] = 0;
         }
     }
+
     // compute eij for all pairs i < j
-    for( int j = 1; j < points.size(); j++ ){
+    for( int j = 0; j < points.size(); j++ ){
         for( int i = 0; i < j; i++ ){
             sub.clear();
             subVec( points , sub , i , j );
+            bestFit( sub , a , b );
             eij[i][j] = error( sub , a , b );
+            //cout << i << " " << j << " " << eij[i][j] << endl;
         }
     }
-
-    err = error( points , a , b );
-    cout << a << " " << b << " error: " << err << endl;
-
-    return 0;
+    
+    float C = 1.0, minErr = 99999, min_i = 0, temperr = 0;
+    for( int j = 1; j < n; j++ ){
+        for( int i = 1; i <= j; i++ ){
+            temperr = eij[i][j] + C + M[i-1];
+            if( temperr < minErr ){
+                minErr = temperr;
+                min_i = i;
+            }
+        }
+        //cout << minErr << endl;
+        M[j] = minErr;
+        minErr = 99999;
+    }
+    
+    return M[n - 1];
 }
 
 void subVec( vector<point*>& vec, vector<point*>& subVec, int i , int j ){
