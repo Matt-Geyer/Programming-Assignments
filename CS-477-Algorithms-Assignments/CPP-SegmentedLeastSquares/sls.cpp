@@ -35,6 +35,8 @@ void findSegs( int );
 float* M;
 float** eij;
 vector<point*> points;
+float C = 250.0;
+int n = 0;
 
 int main( int argc , char** argv ){
 
@@ -47,6 +49,8 @@ int main( int argc , char** argv ){
     ifstream fin(fileName.c_str());
     float x,y;
     point* tp;
+    // start points at 1
+    points.push_back(NULL);
     while( !fin.eof() ){
         fin >> x >> y;
         tp = new point( x , y );
@@ -54,9 +58,10 @@ int main( int argc , char** argv ){
     }
     points.pop_back();
     fin.close();
-    cout << points.size() << endl;
-    segSquares( points , points.size() );
-    findSegs( points.size() );
+
+    n = points.size() - 1;
+    segSquares( points , n );
+    findSegs( n );
 
     for( int i = 0; i < points.size(); i++ ){
         //cout << M[i] << endl;
@@ -65,11 +70,11 @@ int main( int argc , char** argv ){
 }
 
 void findSegs( int j ){
-    float C = 1.0, sum = 0.0, min = 100000.0, min_i = 0.0;
+    float sum = 0.0, min = 100000.0, min_i = 0.0;
     if( j == 0 ) return;
   
     else{
-        for( int i = 1; i < j; i++ ){
+        for( int i = 1; i <= j; i++ ){
             sum = eij[i][j] + C + M[i-1];
             //cout << sum << " " << min << endl;
             if( sum < min ){
@@ -77,11 +82,8 @@ void findSegs( int j ){
                 min_i = i;
             }
         }
-        cout << "Calling findSegs with " << min_i << endl;
         findSegs( min_i - 1 );
-        for( int i = min_i; i < j; i++ ){
-            points[i]->print();
-        }
+        cout << "i: " << min_i << " j: " << j << endl;
     }
 }
             
@@ -110,18 +112,18 @@ float segSquares( vector<point*>& points , int n ){
     }
 
     // compute eij for all pairs i < j
-    for( int j = 0; j < points.size(); j++ ){
-        for( int i = 0; i < j; i++ ){
+    for( int j = 1; j <= n; j++ ){
+        for( int i = 1; i <= j; i++ ){
             sub.clear();
-            subVec( points , sub , i , j );
+            subVec( points , sub , i , j+1 );
             bestFit( sub , a , b );
             eij[i][j] = error( sub , a , b );
             //cout << i << " " << j << " " << eij[i][j] << endl;
         }
     }
     
-    float C = 1.0, minErr = 99999, min_i = 0, temperr = 0;
-    for( int j = 1; j < n; j++ ){
+    float minErr = 99999, min_i = 0, temperr = 0;
+    for( int j = 1; j <= n; j++ ){
         for( int i = 1; i <= j; i++ ){
             temperr = eij[i][j] + C + M[i-1];
             if( temperr < minErr ){
