@@ -1,0 +1,1 @@
+This is a markov generator that gets its probabilites from a Mongo collection that was created using map-reduce.
